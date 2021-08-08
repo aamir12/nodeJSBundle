@@ -18,6 +18,7 @@ const errorHandler = (err, req, res, next) => {
   } else {
     if (res.statusCode === 404) {
       // send to 404 page
+      res.render("404");
     }
   }
 };
