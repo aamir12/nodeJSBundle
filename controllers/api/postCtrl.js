@@ -20,11 +20,15 @@ exports.addPost = asyncHandler(async (req, res) => {
     createdAt: date,
     updatedAt: date,
   };
-  const response = await postMdl.addPost(data);
-  if (response.status) {
-    return res.status(200).json(response);
+  const result = await postMdl.addPost(data);
+  if (result) {
+    return res
+      .status(200)
+      .json({ status: true, message: "Post insert successfully" });
   } else {
-    return res.status(403).json(response);
+    return res
+      .status(403)
+      .json({ status: false, message: "Something went wrong" });
   }
 });
 
@@ -56,11 +60,17 @@ exports.updatePost = asyncHandler(async (req, res) => {
     id: id,
     user_id: req.userId,
   };
-  const response = await postMdl.updatePost(data, conditions);
-  if (response.status) {
-    return res.status(200).json(response);
-  } else {
-    return res.status(403).json(response);
+  const result = await postMdl.updatePost(data, conditions);
+  if (result === "success") {
+    return res
+      .status(200)
+      .json({ status: true, message: "Post insert successfully" });
+  } else if (result === "notFound") {
+    return res.status(403).json({ status: false, message: "Post not found" });
+  } else if (result === "error") {
+    return res
+      .status(403)
+      .json({ status: false, message: "Something went wrong" });
   }
 });
 
@@ -77,20 +87,33 @@ exports.deletePost = asyncHandler(async (req, res) => {
     id: id,
     user_id: req.userId,
   };
-  const response = await postMdl.deletePost(conditions);
-  if (response.status) {
-    return res.status(200).json(response);
-  } else {
-    return res.status(403).json(response);
+  const result = await postMdl.deletePost(conditions);
+  if (result === "success") {
+    return res
+      .status(200)
+      .json({ status: true, message: "Post delete successfully" });
+  } else if (result === "notFound") {
+    return res.status(403).json({ status: false, message: "Post not found" });
+  } else if (result === "error") {
+    return res
+      .status(403)
+      .json({ status: false, message: "Something went wrong" });
   }
 });
 
 exports.allPost = asyncHandler(async (req, res) => {
-  const response = await postMdl.allPost();
-  if (response.status) {
-    return res.status(200).json(response);
+  const result = await postMdl.allPost();
+  if (result) {
+    return res.status(200).json({
+      status: true,
+      message: "Get post list successfully",
+      data: result,
+    });
   } else {
-    return res.status(403).json(response);
+    return res.status(403).json({
+      status: false,
+      message: "Something went wrong",
+    });
   }
 });
 
@@ -102,10 +125,17 @@ exports.getPost = asyncHandler(async (req, res) => {
       message: "Please enter valid  inputs",
     });
   }
-  const response = await postMdl.getPost({ id });
-  if (response.status) {
-    return res.status(200).json(response);
+  const result = await postMdl.getPost({ id });
+  if (result) {
+    return res.status(200).json({
+      status: true,
+      message: "Post get successfully",
+      data: result,
+    });
   } else {
-    return res.status(403).json(response);
+    return res.status(403).json({
+      status: false,
+      message: "Post not found",
+    });
   }
 });

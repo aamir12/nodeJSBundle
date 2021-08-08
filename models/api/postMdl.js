@@ -4,81 +4,50 @@ const {
   generateToken,
 } = require("../../utils/authHelper");
 const { dbInsert, dbGet, dbUpdate, dbDelete } = require("../../utils/dbHelper");
+
 exports.addPost = async (data) => {
-  let response = {
-    status: false,
-    message: "Something went wrong",
-  };
   const check = await dbInsert("posts", data);
-  if (check) {
-    response["status"] = true;
-    response["message"] = "Data insert successfully";
-  }
-  return response;
+  return check;
 };
 
 exports.updatePost = async (data, conditions) => {
-  let response = {
-    status: false,
-    message: "Something went wrong",
-  };
   const isExist = await dbGet("posts", conditions, [], "single");
   if (!isExist) {
-    response["status"] = false;
-    response["message"] = "Record not found";
-    return response;
+    return "notFound";
   }
   const check = await dbUpdate("posts", data, conditions);
   if (check) {
-    response["status"] = true;
-    response["message"] = "Data update successfully";
+    return "success";
   }
-  return response;
+  return "error";
 };
 
 exports.deletePost = async (conditions) => {
-  let response = {
-    status: false,
-    message: "Something went wrong",
-  };
   const isExist = await dbGet("posts", conditions, [], "single");
   if (!isExist) {
-    response["status"] = false;
-    response["message"] = "Record not found";
-    return response;
+    return "notFound";
   }
   const check = await dbDelete("posts", conditions);
   if (check) {
-    response["status"] = true;
-    response["message"] = "Data delete successfully";
+    return "success";
   }
-  return response;
+  return "error";
 };
 
 exports.allPost = async () => {
-  let response = {
-    status: false,
-    message: "Something went wrong",
-  };
+  let response = false;
   const check = await dbGet("posts");
   if (check) {
-    response["status"] = true;
-    response["message"] = "Get data list successfully";
-    response["data"] = check;
+    response = check;
   }
   return response;
 };
 
 exports.getPost = async (conditions) => {
-  let response = {
-    status: false,
-    message: "Post not found",
-  };
+  let response = false;
   const check = await dbGet("posts", conditions, [], "single");
   if (check) {
-    response["status"] = true;
-    response["message"] = "Get data successfully";
-    response["data"] = check;
+    response = check;
   }
   return response;
 };
