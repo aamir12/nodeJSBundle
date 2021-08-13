@@ -57,9 +57,12 @@ const dbInsert = async (table, data, print = false) => {
 //update
 //table:table name
 //data: data to be update
-//condition: update condition
-//print: log query
-const dbUpdate = async (table, data, conditions = {}, print = false) => {
+//options:{conditions:{},print:false}
+const dbUpdate = async (
+  table,
+  data,
+  options = { conditions: {}, print: false }
+) => {
   let query = `Update  ${table} set `;
   let values = [];
   Object.keys(data).forEach((key) => {
@@ -68,17 +71,17 @@ const dbUpdate = async (table, data, conditions = {}, print = false) => {
   });
 
   query = query.slice(0, -1);
-  const conditionArr = Object.keys(conditions);
+  const conditionArr = Object.keys(options?.conditions || {});
   if (conditionArr.length > 0) {
     query = `${query} where `;
     conditionArr.forEach((key) => {
       query = `${query} ${key} = ? and`;
-      values.push(conditions[key]);
+      values.push(options.conditions[key]);
     });
     query = query.slice(0, -3);
   }
 
-  if (print) {
+  if (options?.print) {
     console.log(query);
   }
   const dbRes = await dbexe(query, values);
@@ -86,19 +89,16 @@ const dbUpdate = async (table, data, conditions = {}, print = false) => {
 };
 
 //table: table name
-//type: all|single : all => all records, single => single record
-//select: table fields
-//conditions: conditions object
+//options:{ select:[array of column],conditions:{condition object},pagination:{page: pagnumber,limit: number of records}}
+//type = "all"|"single"
 const dbGet = async (
   table,
-  conditions = {},
-  select = [],
-  type = "all",
-  print = false
+  options = { select: [], conditions: {} },
+  type = "all"
 ) => {
   let query = `Select `;
-  if (select.length > 0) {
-    select.forEach((key) => {
+  if (options?.select?.length > 0) {
+    options.select.forEach((key) => {
       query = `${query} ${key},`;
     });
     query = query.slice(0, -1);
@@ -107,18 +107,18 @@ const dbGet = async (
   }
   query = `${query} from ${table}`;
 
-  const conditionArr = Object.keys(conditions);
   let values = [];
+  const conditionArr = Object.keys(options?.conditions || {});
   if (conditionArr.length > 0) {
     query = `${query} where `;
     conditionArr.forEach((key) => {
       query = `${query} ${key} = ? and`;
-      values.push(conditions[key]);
+      values.push(options.conditions[key]);
     });
     query = query.slice(0, -3);
   }
 
-  if (print) {
+  if (options?.print) {
     console.log(query);
   }
   const dbRes = await dbexe(query, values, type);
@@ -126,22 +126,21 @@ const dbGet = async (
 };
 
 //table: table name
-//conditions: conditions object
-//print: log query
-const dbDelete = async (table, conditions = {}, print = false) => {
+//options: {conditions:{},print:print query}
+const dbDelete = async (table, options = { conditions: {}, print: false }) => {
   let query = `delete from  ${table}`;
   let values = [];
-  const conditionArr = Object.keys(conditions);
+  const conditionArr = Object.keys(options?.conditions || {});
   if (conditionArr.length > 0) {
     query = `${query} where `;
     conditionArr.forEach((key) => {
       query = `${query} ${key} = ? and`;
-      values.push(conditions[key]);
+      values.push(options.conditions[key]);
     });
     query = query.slice(0, -3);
   }
 
-  if (print) {
+  if (options.print) {
     console.log(query);
   }
   const dbRes = await dbexe(query, values);

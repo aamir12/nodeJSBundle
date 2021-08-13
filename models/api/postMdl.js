@@ -1,3 +1,4 @@
+const { options } = require("../../routes/api/authRoutes");
 const {
   uuid: uniqueId,
   compareAsync,
@@ -11,11 +12,11 @@ exports.addPost = async (data) => {
 };
 
 exports.updatePost = async (data, conditions) => {
-  const isExist = await dbGet("posts", conditions, [], "single");
+  const isExist = await dbGet("posts", { conditions }, "single");
   if (!isExist) {
     return "notFound";
   }
-  const check = await dbUpdate("posts", data, conditions);
+  const check = await dbUpdate("posts", data, { conditions });
   if (check) {
     return "success";
   }
@@ -23,11 +24,11 @@ exports.updatePost = async (data, conditions) => {
 };
 
 exports.deletePost = async (conditions) => {
-  const isExist = await dbGet("posts", conditions, [], "single");
+  const isExist = await dbGet("posts", { conditions }, "single");
   if (!isExist) {
     return "notFound";
   }
-  const check = await dbDelete("posts", conditions);
+  const check = await dbDelete("posts", { conditions });
   if (check) {
     return "success";
   }
@@ -45,7 +46,7 @@ exports.allPost = async () => {
 
 exports.getPost = async (conditions) => {
   let response = false;
-  const check = await dbGet("posts", conditions, [], "single");
+  const check = await dbGet("posts", { conditions }, "single");
   if (check) {
     response = check;
   }

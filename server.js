@@ -4,6 +4,8 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const moment = require("moment");
 const cors = require("cors");
+const flash = require("connect-flash");
+const session = require("express-session");
 
 const { notFound, errorHandler } = require("./middlewares/errorMiddleware.js");
 dotenv.config();
@@ -18,21 +20,29 @@ process.env.TZ = "Asia/Calcutta";
 app.set("view engine", "ejs");
 //view folder
 app.set("views", "views");
-// for getting form data: POST,GET
-app.use(
-  express.urlencoded({
-    extended: false,
-  })
-);
+
+// Body Parser Middleware
+// parse application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: false }));
+// parse application/json
+app.use(express.json());
 
 //set static path for public resources
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
-//set other configuration here like session
-//
-//
+// Express Session Middleware
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+
+// Express Messages Middleware
+app.use(flash());
 
 //set values that will be sent to each and every render
 app.use((req, res, next) => {
